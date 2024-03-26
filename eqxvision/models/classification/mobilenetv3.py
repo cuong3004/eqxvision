@@ -233,18 +233,18 @@ class MobileNetV3(eqx.Module):
             ]
         )
 
-    def __call__(self, x, *, key: "jax.random.PRNGKey") -> Array:
+    def __call__(self, x, state, key: "jax.random.PRNGKey") -> Array:
         """**Arguments:**
 
         - `x`: The input `JAX` array
         - `key`: Required parameter. Utilised by few layers such as `Dropout` or `DropPath`
         """
         keys = jrandom.split(key, 3)
-        x = self.features(x, key=keys[0])
+        x, state = self.features(x, state=state, key=keys[0])
         x = self.avgpool(x, key=keys[1])
         x = jnp.ravel(x)
         x = self.classifier(x, key=keys[2])
-        return x
+        return x, state
 
 
 def _mobilenet_v3_conf(
