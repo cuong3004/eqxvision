@@ -1,9 +1,9 @@
 from . import (
     alexnet,
-    convnext,
-    densenet,
+    # convnext,
+    # densenet,
     efficientnet,
-    googlenet,
+    # googlenet,
     mobilenetv2,
     mobilenetv3,
     # regnet,
