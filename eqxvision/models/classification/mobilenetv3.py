@@ -43,7 +43,7 @@ class _InvertedResidualConfig:
         return _make_divisible(channels * width_mult, 8)
 
 
-class _InvertedResidual(eqx.Module):
+class _InvertedResidual(nn.StatefulLayer):
     # Implemented as described at section 5 of MobileNetV3 paper
     use_res_connect: int
     block: nn.Sequential
@@ -120,16 +120,16 @@ class _InvertedResidual(eqx.Module):
         self.block = nn.Sequential(layers)
         self.out_channels = cnf.out_channels
 
-    def __call__(self, x, *, key: "jax.random.PRNGKey") -> Array:
+    def __call__(self, x, state, key: "jax.random.PRNGKey") -> Array:
         """**Arguments:**
 
         - `x`: The input `JAX` array
         - `key`: Required parameter. Utilised by few layers such as `Dropout` or `DropPath`
         """
-        result = self.block(x, key=key)
+        result, state = self.block(x, state=state, key=key)
         if self.use_res_connect:
             result += x
-        return result
+        return result, state
 
 
 class MobileNetV3(eqx.Module):
