@@ -1,7 +1,7 @@
 from typing import Any, Callable, List, Optional
 
 import equinox as eqx
-import equinox.experimental as eqxex
+# import equinox.experimental as eqxex
 import equinox.nn as nn
 import jax
 import jax.nn as jnn
@@ -37,7 +37,7 @@ class _InvertedResidual(eqx.Module):
         assert stride in [1, 2]
 
         if norm_layer is None:
-            norm_layer = eqxex.BatchNorm
+            norm_layer = nn.BatchNorm
 
         hidden_dim = int(round(inp * expand_ratio))
         self.use_res_connect = self.stride == 1 and inp == oup
@@ -131,7 +131,7 @@ class MobileNetV2(eqx.Module):
             block = _InvertedResidual
 
         if norm_layer is None:
-            norm_layer = eqxex.BatchNorm
+            norm_layer = nn.BatchNorm
 
         input_channel = 32
         last_channel = 1280
