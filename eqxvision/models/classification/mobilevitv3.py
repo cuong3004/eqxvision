@@ -64,21 +64,21 @@ class BaseEncoder(eqx.Module):
 
         self.model_conf_dict = dict()
         
-    def extract_features(self, x, *args, **kwargs):
-        x = self.conv_1(x)
-        x = self.layer_1(x)
-        x = self.layer_2(x)
-        x = self.layer_3(x)
+    # def extract_features(self, x, *args, **kwargs):
+    #     x = self.conv_1(x)
+    #     x = self.layer_1(x)
+    #     x = self.layer_2(x)
+    #     x = self.layer_3(x)
 
-        x = self.layer_4(x)
-        x = self.layer_5(x)
-        x = self.conv_1x1_exp(x)
-        return x
+    #     x = self.layer_4(x)
+    #     x = self.layer_5(x)
+    #     x = self.conv_1x1_exp(x)
+    #     return x
     
-    def forward(self, x, *args, **kwargs):
-        x = self.extract_features(x)
-        x = self.classifier(x)
-        return x
+    # def forward(self, x, *args, **kwargs):
+    #     x = self.extract_features(x)
+    #     x = self.classifier(x)
+    #     return x
     
 class InvertedResidual(eqx.nn.StatefulLayer):
     block: eqx.Module
@@ -570,21 +570,9 @@ class MobileViTv3(BaseEncoder):
         x, state = self.conv_1x1_exp(x, state=state, key=keys[6])
         
         x = self.classifier(x, key=keys[7])
-        
-        # x = self.conv_1(x)
-        # x = self.layer_1(x)
-        # x = self.layer_2(x)
-        # x = self.layer_3(x)
-
-        # x = self.layer_4(x)
-        # x = self.layer_5(x)
-        # x = self.conv_1x1_exp(x)
-        
-        # x, state = self.layer_1(x, state=state, key=keys[1])
-        # x, state = self.layer_1(x, state=state, key=keys[1])
-        # x, state = self.layer_1[1](x, state, key=keys[1])
-        # x, state = self.layer_1[2](x, state, key=keys[1])
-        
+    
+        print(x.shape)
+        print(state)
         return x, state
         
 def mobievit_xx_small_v3(key, n_classes=1000):
