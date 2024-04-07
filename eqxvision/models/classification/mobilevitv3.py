@@ -609,7 +609,43 @@ def mobievit_xx_small_v3(key, n_classes=1000):
     # x = jnp.ones((2,3,256,256))
     model =  MobileViTv3(opts, key)
     return model
+
+def create_model(key):
+    keys = jax.random.split(key, 3)
+    model = mobievit_xx_small_v3(keys[0], 1000)
     
+    # model = mobilenet_v3_small(torch_weights=None, num_classes=1000)
+#     print(model.features)
+    # model.features.layers[0].layers[0] = eqx.nn.Conv2d(3, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), use_bias=False, key=keys[0])
+    # model.features[1].block.layers[0].layers[0] = eqx.nn.Conv2d(16, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), use_bias=False, key=keys[1])
+    # model.conv1 = nn.Conv2d(3, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+    # model.maxpool = nn.Identity()
+
+    model = eqx.tree_at(lambda tree: tree.conv_1.layers[0], 
+                    model, 
+                    eqx.nn.Conv2d(in_channels=3,
+                                out_channels=16,
+                                kernel_size=(3, 5),
+                                stride=(1, 3),
+                                padding=((1, 1), (1, 1)),
+                                dilation=(1, 1),
+                                groups=1,
+                                use_bias=False, key=key))
+
+    model = eqx.tree_at(lambda model:model.layer_2.layers[0].block[1][0], 
+                        model, 
+                        eqx.nn.Conv2d(
+                        in_channels=32,
+                        out_channels=32,
+                        kernel_size=(3, 5),
+                        stride=(2, 3),
+                        padding=((1, 1), (1, 1)),
+                        dilation=(1, 1),
+                        groups=32,
+                        use_bias=False,
+                        key=key
+                    ))
+    return model
 
 if __name__ == "__main__":
     opts = argparse.Namespace()
@@ -640,8 +676,10 @@ if __name__ == "__main__":
     setattr(opts,"model.classification.n_classes", 1000)
 
     key = jax.random.PRNGKey(0)
-    x = jnp.ones((2,3,224,224))
-    model =  MobileViTv3(opts, key)
+    x = jnp.ones((2,3,128,625))
+    # model =  MobileViTv3(opts, key)
+    model = create_model(key)
+    
     state = eqx.nn.State(model)
     
     import optax 
