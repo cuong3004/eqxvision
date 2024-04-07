@@ -651,7 +651,7 @@ if __name__ == "__main__":
     @eqx.filter_jit
     @eqx.filter_grad
     def loss(model, x, y):
-        pred_y = jax.vmap(model, in_axes=(0,None,None), out_axes=(0), axis_name="batch")(x, state, key)
+        pred_y, _ = jax.vmap(model, in_axes=(0,None,None), out_axes=(0), axis_name="batch")(x, state, key)
         print(pred_y.shape)
         return optax.softmax_cross_entropy_with_integer_labels(pred_y, y).mean()
 
