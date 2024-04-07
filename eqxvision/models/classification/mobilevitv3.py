@@ -588,8 +588,9 @@ class MobileViTv3(BaseEncoder):
         return x
         
 def mobievit_xx_small_v3(key, n_classes=1000):
-    opts = argparse.Namespace()
     import argparse
+    opts = argparse.Namespace()
+    
     setattr(opts,"model.classification.name","mobilevit_v3")
     setattr(opts,"model.classification.classifier_dropout", 0.1)
 
