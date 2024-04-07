@@ -571,8 +571,8 @@ class MobileViTv3(BaseEncoder):
         
         x = self.classifier(x, key=keys[7])
     
-        print(x.shape)
-        print(state)
+        # print(x.shape)
+        # print(state)
         return x, state
         
 def mobievit_xx_small_v3(key, n_classes=1000):
@@ -648,18 +648,18 @@ if __name__ == "__main__":
     optim = optax.adamw(0.0001)
     opt_state = optim.init(eqx.filter(model, eqx.is_array))
     
-    @eqx.filter_jit
-    @eqx.filter_grad
+    # @eqx.filter_jit
+    # @eqx.filter_grad
     def loss(model, x, y):
         pred_y, _ = jax.vmap(model, in_axes=(0,None,None), out_axes=(0), axis_name="batch")(x, state, key)
-        print(pred_y.shape)
+        # print(pred_y.shape)
         return optax.softmax_cross_entropy_with_integer_labels(pred_y, y).mean()
 
     
     grads = loss(model, x, jnp.array([9,5]))
     
-    updates, opt_state = optim.update(grads, opt_state, model)
-    model = eqx.apply_updates(model, updates)
+    # updates, opt_state = optim.update(grads, opt_state, model)
+    # model = eqx.apply_updates(model, updates)
     # print(len(grads))
     # learning_rate = 0.1
     # a = jax.tree_util.tree_map(lambda m, g: None if g==None else m.shape, model, grads)
