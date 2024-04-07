@@ -568,11 +568,12 @@ class MobileViTv3(BaseEncoder):
         x, state = self.layer_4(x, state=state, key=keys[4])
         x, state = self.layer_5(x, state=state, key=keys[5])
         x, state = self.conv_1x1_exp(x, state=state, key=keys[6])
-        
+        # print(x.shape)
         x = self.classifier(x, key=keys[7])
     
         # print(x.shape)
         # print(state)
+        
         return x, state
         
 def mobievit_xx_small_v3(key, n_classes=1000):
@@ -639,7 +640,7 @@ if __name__ == "__main__":
     setattr(opts,"model.classification.n_classes", 1000)
 
     key = jax.random.PRNGKey(0)
-    x = jnp.ones((2,3,256,256))
+    x = jnp.ones((2,3,224,224))
     model =  MobileViTv3(opts, key)
     state = eqx.nn.State(model)
     
