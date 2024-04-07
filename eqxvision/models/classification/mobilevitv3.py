@@ -585,7 +585,7 @@ class MobileViTv3(BaseEncoder):
         # x, state = self.layer_1[1](x, state, key=keys[1])
         # x, state = self.layer_1[2](x, state, key=keys[1])
         
-        return x
+        return x, state
         
 def mobievit_xx_small_v3(key, n_classes=1000):
     import argparse
