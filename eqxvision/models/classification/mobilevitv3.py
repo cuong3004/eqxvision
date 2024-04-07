@@ -568,7 +568,7 @@ class MobileViTv3(BaseEncoder):
         x, state = self.layer_4(x, state=state, key=keys[4])
         x, state = self.layer_5(x, state=state, key=keys[5])
         x, state = self.conv_1x1_exp(x, state=state, key=keys[6])
-        print(x.shape)
+        # print(x.shape)
         x = self.classifier(x, key=keys[7])
     
         # print(x.shape)
