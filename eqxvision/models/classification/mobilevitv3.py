@@ -695,7 +695,7 @@ if __name__ == "__main__":
         return optax.softmax_cross_entropy_with_integer_labels(pred_y, y).mean()
 
     
-    grads = loss(model, x, jnp.array([9]))
+    grads = loss(model, x, jnp.array([9,6,4,1]))
     params, static = eqx.partition(model, eqx.is_array)
     updates, opt_state = optim.update(grads, opt_state, params)
     params = eqx.apply_updates(model, updates)
