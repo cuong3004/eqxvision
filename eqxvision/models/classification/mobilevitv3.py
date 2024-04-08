@@ -623,9 +623,9 @@ def create_model(key):
 
     model = eqx.tree_at(lambda tree: tree.conv_1.layers[0], 
                     model, 
-                    eqx.nn.Conv2d(in_channels=3,
+                    eqx.nn.Conv2d(in_channels=1,
                                 out_channels=16,
-                                kernel_size=(3, 5),
+                                kernel_size=(3, 3),
                                 stride=(1, 3),
                                 padding=((1, 1), (1, 1)),
                                 dilation=(1, 1),
@@ -637,7 +637,7 @@ def create_model(key):
                         eqx.nn.Conv2d(
                         in_channels=32,
                         out_channels=32,
-                        kernel_size=(3, 5),
+                        kernel_size=(3, 3),
                         stride=(2, 3),
                         padding=((1, 1), (1, 1)),
                         dilation=(1, 1),
@@ -676,7 +676,7 @@ if __name__ == "__main__":
     setattr(opts,"model.classification.n_classes", 1000)
 
     key = jax.random.PRNGKey(0)
-    x = jnp.ones((2,3,128,625))
+    x = jnp.ones((4,1,128,626))
     # model =  MobileViTv3(opts, key)
     model = create_model(key)
     
@@ -687,18 +687,21 @@ if __name__ == "__main__":
     optim = optax.adamw(0.0001)
     opt_state = optim.init(eqx.filter(model, eqx.is_array))
     
-    # @eqx.filter_jit
-    # @eqx.filter_grad
+    @eqx.filter_jit
+    @eqx.filter_grad
     def loss(model, x, y):
         pred_y, _ = jax.vmap(model, in_axes=(0,None,None), out_axes=(0), axis_name="batch")(x, state, key)
         # print(pred_y.shape)
         return optax.softmax_cross_entropy_with_integer_labels(pred_y, y).mean()
 
     
-    grads = loss(model, x, jnp.array([9,5]))
+    grads = loss(model, x, jnp.array([9]))
+    params, static = eqx.partition(model, eqx.is_array)
+    updates, opt_state = optim.update(grads, opt_state, params)
+    params = eqx.apply_updates(model, updates)
+    model = eqx.combine(params, static)
     
-    # updates, opt_state = optim.update(grads, opt_state, model)
-    # model = eqx.apply_updates(model, updates)
+    print("is ok")
     # print(len(grads))
     # learning_rate = 0.1
     # a = jax.tree_util.tree_map(lambda m, g: None if g==None else m.shape, model, grads)
